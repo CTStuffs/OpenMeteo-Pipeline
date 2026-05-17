@@ -15,11 +15,12 @@ def load_to_db(df):
     db_password = os.getenv('DB_PASSWORD')
     db_host = os.getenv('DB_HOST')
     db_port = os.getenv('DB_PORT')
-    db_database_name = os.getenv('DB_DATABSE_NAME')
+    db_database_name = os.getenv('DB_DATABASE_NAME')
 
     engine = create_engine(f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}:{db_port}/{db_database_name}")
 
     table_name = "mytable"
 
-    df.to_sql(table_name, engine, if_exists="append", index=False)
+    with engine.begin() as conn:
+        df.to_sql(table_name, conn, if_exists="append", index=False)
 
