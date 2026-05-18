@@ -10,7 +10,7 @@ def transform_request(dict):
     df = df.drop_duplicates()
     df = df.dropna()
 
-    df["time"] = pd.to_datetime(df['time'], format=dict['current_weather_units']['time'])
+    df["time"] = pd.to_datetime(df['time'], format=dict['current_weather_units']['time'].upper())
     df["interval"] = df["interval"].astype(int)
     df["temperature"] = df["temperature"].astype(float)
     df["windspeed"] = df["windspeed"].astype(int)

@@ -3,6 +3,7 @@ import os
 from sqlalchemy import create_engine
 from dotenv import load_dotenv
 load_dotenv()
+from sqlalchemy_utils import database_exists, create_database
 
 import logging
 
@@ -17,6 +18,9 @@ def load_to_db(df):
 
     logger.info("Connecting to database...")
     engine = create_engine(f"postgresql+psycopg2://{db_username}:{db_password}@{db_host}:{db_port}/{db_database_name}")
+
+    if not database_exists(engine.url):
+        create_database(engine.url)
 
     table_name = os.getenv('DB_TABLE_NAME')
 
