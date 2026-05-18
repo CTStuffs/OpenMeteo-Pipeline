@@ -1,14 +1,16 @@
 
 import pandas as pd
+import logging
+
+logger = logging.getLogger(__name__)
 def transform_request(dict):
-    # df = pd.read_json(json["current_weather"])
     df = pd.DataFrame(dict["current_weather"], index=[0])
+    logger.info("Transforming data...")
 
-    # print(df)
+    df = df.drop_duplicates()
+    df = df.dropna()
 
-    # then clean the data
-
-    df["time"] = pd.to_datetime(df['time'], format='ISO8601')
+    df["time"] = pd.to_datetime(df['time'], format=dict['current_weather_units']['time'])
     df["interval"] = df["interval"].astype(int)
     df["temperature"] = df["temperature"].astype(float)
     df["windspeed"] = df["windspeed"].astype(int)
@@ -23,10 +25,5 @@ def transform_request(dict):
         "interval": "interval_seconds",
 
     }, inplace=True)
-    print(df)
-
-    # then rename the columns into something more meaningful
-
-    # then set the columns to the appropriate data type
-
+    logger.info("Transform success!")
     return df
