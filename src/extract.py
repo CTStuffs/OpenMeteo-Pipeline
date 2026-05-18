@@ -12,11 +12,14 @@ def get_request():
 
 
   logger.info("Retrieving data from OpenMeteo...")
+  responses = requests.get(f'https://api.open-meteo.com/v1/forecast?latitude={locations[0]["lat"]}&longitude={locations[0]["lon"]}&current_weather=true')
+
   try:
-    responses = requests.get(f'https://api.open-meteo.com/v1/forecast?latitude={locations[0]["lat"]}&longitude={locations[0]["lon"]}&current_weather=true')
-  except requests.exceptions.HTTPError as errh:
-    logger.error("HTTP Error:", errh)
-    
+    responses.raise_for_status()
+  except Exception as err:
+    logger.error("HTTP Error: %s", err)
+    raise
+
   logger.info("Retrieval success!")
 
   logger.info("Writing data to file...")
