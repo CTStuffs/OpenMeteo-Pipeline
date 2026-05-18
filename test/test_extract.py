@@ -34,11 +34,11 @@ def test_http_error_handling(mock_get):
         "error": "error message"
     }
     fake_response.raise_for_status.side_effect = (
-        Exception("500 Server Error")
+        requests.exceptions.HTTPError("500 Server Error")
     )
 
     mock_get.return_value = fake_response
-    with pytest.raises(Exception):
+    with pytest.raises(requests.exceptions.HTTPError):
         get_request()
 
 @patch("src.extract.requests.get")
