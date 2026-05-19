@@ -19,12 +19,11 @@ def test_successful_api_request(mock_get):
 
     result = get_request()
 
+    mock_get.assert_called_once()
     assert result == {
         "test": 22,
         "testval2": "Sunny"
     }
-
-    mock_get.assert_called_once()
 
 
 @patch("src.extract.requests.get")
@@ -50,18 +49,39 @@ def test_file_write_success(mock_get):
     mock_get.return_value = fake_response
     mocked_file = mock_open()
 
-    
     with patch("builtins.open", mocked_file):
         get_request()
         mocked_file.assert_called_once_with("./data/raw_data.json", "a")
         handle = mocked_file()
         handle.write.assert_called_once_with(json.dumps(fake_response.json.return_value, indent=2))
 
-def test_file_write_error_handling():
-    """Verify IOError is caught and logged when file write fails."""
-    pass
+@patch("src.extract.requests.get")
+def test_file_write_error_handling(mock_get):
+    fake_response = Mock()
+    fake_response.json.return_value = "test"
+    fake_response.raise_for_status.return_value = None
 
+    mock_get.return_value = fake_response
+    
+    mocked_file = mock_open()
+    mocked_file.side_effect = IOError("File write error")
+    with patch("builtins.open", mocked_file):
+        get_request()
 
-def test_return_value():
-    """Verify the function returns the parsed JSON response."""
-    pass
+@patch("src.extract.requests.get")
+def test_return_value(mock_get):
+    fake_response = Mock()
+    fake_response.json.return_value = {
+        "test": 22,
+        "testval2": "Sunny"
+    }
+    fake_response.raise_for_status.return_value = None
+
+    mock_get.return_value = fake_response
+
+    result = get_request()
+
+    assert result == {
+        "test": 22,
+        "testval2": "Sunny"
+    }

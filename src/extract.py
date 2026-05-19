@@ -16,7 +16,7 @@ def get_request():
 
   try:
     responses.raise_for_status()
-  except Exception as err:
+  except requests.exceptions.HTTPError as err:
     logger.error("HTTP Error: %s", err)
     raise
 
@@ -28,7 +28,7 @@ def get_request():
     with open("./data/raw_data.json", "a") as f:
       f.write(json.dumps(responses.json(), indent=2))
   except IOError as err:
-    logger.error("IO Error:", err)
+    logger.error("IO Error: %s", err)
   logger.info("Write success!")
 
   return responses.json()
