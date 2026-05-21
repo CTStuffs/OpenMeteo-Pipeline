@@ -1,37 +1,62 @@
-This project introduces aspiring data engineers to the fundamental process of building a data pipeline, focusing on three core aspects: data collection, cleansing, and storage.
+# Open-Meteo Data Pipeline Demo
 
-Using Python, you’ll fetch weather conditions and forecasts from Open-Meteo, a completely free API that requires no API key. Once the weather data is collected, you’ll process the raw JSON, which may involve converting temperature units, handling missing values, or standardizing location names. Finally, you’ll store the cleansed data in a PostgreSQL database.
-
-Modern Twist (Recommended): Instead of installing PostgreSQL directly on your computer, try running it in a Docker container. This keeps your computer clean and proves to employers that you understand containerization (a mandatory skill for modern data engineering).
-
-Resources 
-
-Here are some valuable resources to help you with this specific stack:
-
-Documentation:
-Open-Meteo Docs: The documentation is excellent and includes a URL builder so you can see the data structure before you write any code.
-GitHub repositories:
-
-Weather and Air Quality ETL Pipeline: This repository demonstrates an ETL pipeline that extracts weather and air quality data from public APIs, transforms it into a clean, analyzable format, and loads it into a PostgreSQL database.
-Weather Data Integration Project: An end-to-end ETL pipeline that extracts weather data, transforms it, and loads it into a PostgreSQL database.
-Courses:
-
-Creating PostgreSQL Databases: This course offers a comprehensive guide to PostgreSQL, covering essential skills for creating, managing, and optimizing databases—a critical step in the weather data pipeline.
-Data Engineer in Python: This skill track covers foundational data engineering skills, including data collection, transformation, and storage, providing a strong start for building pipelines in Python.
-Skills developed
-Using Python to write data pipeline applications.
-Collecting data from external sources (APIs).
-Docker basics (spinning up a database container).
-Setting up databases and writing SQL to store data.
+A Python-based ETL pipeline that queries data from [Open Meteo](https://open-meteo.com/) applies cleaning and transformation logic, and loads the result a local PostgreSQL database. 
 
 
+## Project Overview
 
-Open-Meteo API
-       ↓
-Python Extraction Script
-       ↓
-Data Cleaning & Transformation
-       ↓
-PostgreSQL Database
-       ↓
-(Optional) Queries / Dashboard / Analytics
+- Extract: read raw weather data from the Open Meteo API `data/raw/`.
+- Transform: clean, normalize, and validate rows in `src/transform.py`.
+- Load: append transformed results into a local PostgreSQL table using `src/load.py`.
+- Test: unit tests for above three tasks in `test/`
+
+## Architecture
+
+- `main.py` — pipeline orchestrator using environment variables.
+- `src/extract.py` — API querying logic.
+- `src/transform.py` — data validation, normalization, and type conversion.
+- `src/load.py` — Database upload
+- `data/` — local data storage
+- `test/` — unit tests
+- `logging-config.py` — specifies logging features
+
+
+## Quick Start
+
+1. Install dependencies:
+
+```bash
+pip install requests pytest pandas sqlalchemy python-dotenv sqlalchemy-utils
+```
+
+2. Setup your local [PostgreSQL](https://www.postgresql.org/) Database
+
+3. Configure environment variables in `.env`:
+
+```text
+DB_USERNAME=<Your PostgreSQL DB username>
+DB_PASSWORD=<Your PostgreSQL DB password>
+DB_HOST=<Your PostgreSQL DB host name>
+DB_PORT=<Your PostgreSQL DB host port>
+DB_DATABASE_NAME=<DB name>
+DB_TABLE_NAME=<table name>
+```
+
+3. Run the pipeline:
+
+Ensure that your PostgreSQL DB is running. Then run:
+
+```bash
+python main.py
+```
+
+## Testing
+```
+pytest test/
+```
+
+## Output
+
+- Cleaned dataset loaded into DB_TABLE_NAME under DB_TABLE_NAME
+- Duplicate rows are removed, rows with missing data are dropped, specific column headers are renamed to be more informative and numeric fields are normalized.
+

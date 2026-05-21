@@ -9,27 +9,23 @@ def test_dataframe_creation(load_sample_data):
 
 
 def test_duplicate_removal(load_sample_data):
-    """Verify drop_duplicates() removes any duplicate rows."""
     df = load_sample_data.copy()
     df_cleaned = df.drop_duplicates()
     assert not df_cleaned.duplicated().any(), "DataFrame still contains duplicate rows."
 
 
 def test_null_removal(load_sample_data):
-    """Verify dropna() removes rows with missing values."""
     df = load_sample_data.copy()
     df_cleaned = df.dropna()
     assert not df_cleaned.isnull().any().any(), "DataFrame still contains missing values."
 
 
 def test_datetime_conversion(load_sample_data):
-    """Verify the time column is converted to datetime with correct format."""
     df = load_sample_data.copy()
     assert pd.api.types.is_datetime64_any_dtype(df['time']), "Time column is not of datetime type."
 
 
 def test_type_conversions(load_sample_data):
-    """Verify all numeric columns are converted to correct types."""
     df = load_sample_data.copy()
     assert pd.api.types.is_float_dtype(df['temperature_celsius']), "Temperature column is not float."
     assert pd.api.types.is_integer_dtype(df['windspeed_km_per_hr']), "Windspeed column is not integer."
@@ -39,7 +35,6 @@ def test_type_conversions(load_sample_data):
 
 
 def test_valid_output_structure(load_sample_data):
-    """Verify the returned DataFrame has expected shape and columns."""
     df = load_sample_data.copy()
     assert df.shape[0] > 0, "DataFrame is empty."
     assert 'temperature_celsius' in df.columns, "Expected column 'temperature_celsius' not found."

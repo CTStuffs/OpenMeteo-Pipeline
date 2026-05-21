@@ -25,7 +25,7 @@ def get_request():
   logger.info("Writing data to file...")
 
   try:
-    with open("./data/raw_data.json", "a") as f:
+    with open("./data/raw_data.json", "w") as f:
       f.write(json.dumps(responses.json(), indent=2))
   except IOError as err:
     logger.error("IO Error: %s", err)

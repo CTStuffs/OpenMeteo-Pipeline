@@ -3,12 +3,12 @@ import os
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
 from dotenv import load_dotenv
-load_dotenv()
 from sqlalchemy_utils import database_exists, create_database
 
 import logging
 
 logger = logging.getLogger(__name__)
+load_dotenv()
 
 def load_to_db(df):
     db_username = os.getenv('DB_USERNAME')
