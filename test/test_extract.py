@@ -1,13 +1,12 @@
 import json
 
 import requests
-
 import pytest
 from unittest.mock import patch, mock_open, MagicMock, Mock
 from src.extract import get_request
 
-@patch("src.extract.requests.get")
-def test_successful_api_request(mock_get):
+
+def test_successful_api_request():
     fake_response = Mock()
     fake_response.json.return_value = {
         "test": 22,
@@ -15,9 +14,8 @@ def test_successful_api_request(mock_get):
     }
     fake_response.raise_for_status.return_value = None
 
-    mock_get.return_value = fake_response
-
-    result = get_request()
+    with patch("src.extract.requests.get", return_value=fake_response) as mock_get:
+        result = get_request()
 
     mock_get.assert_called_once()
     assert result == {
@@ -26,9 +24,8 @@ def test_successful_api_request(mock_get):
     }
 
 
-@patch("src.extract.requests.get")
-def test_http_error_handling(mock_get):
-    fake_response = Mock()
+def test_http_error_handling():
+    fake_response = MagicMock()
     fake_response.json.return_value = {
         "error": "error message"
     }
@@ -36,50 +33,48 @@ def test_http_error_handling(mock_get):
         requests.exceptions.HTTPError("500 Server Error")
     )
 
-    mock_get.return_value = fake_response
-    with pytest.raises(requests.exceptions.HTTPError):
-        get_request()
+    with patch("src.extract.requests.get", return_value=fake_response):
+        with pytest.raises(requests.exceptions.HTTPError):
+            get_request()
 
-@patch("src.extract.requests.get")
-def test_file_write_success(mock_get):
-    fake_response = Mock()
+
+def test_file_write_success():
+    fake_response = MagicMock()
     fake_response.json.return_value = "test"
-    
     fake_response.raise_for_status.return_value = None
-    mock_get.return_value = fake_response
     mocked_file = mock_open()
 
-    with patch("builtins.open", mocked_file):
+    with patch("src.extract.requests.get", return_value=fake_response), \
+         patch("builtins.open", mocked_file):
         get_request()
-        mocked_file.assert_called_once_with("./data/raw_data.json", "a")
-        handle = mocked_file()
-        handle.write.assert_called_once_with(json.dumps(fake_response.json.return_value, indent=2))
 
-@patch("src.extract.requests.get")
-def test_file_write_error_handling(mock_get):
-    fake_response = Mock()
+    mocked_file.assert_called_once_with("./data/raw_data.json", "a")
+    handle = mocked_file()
+    handle.write.assert_called_once_with(json.dumps(fake_response.json.return_value, indent=2))
+
+
+def test_file_write_error_handling():
+    fake_response = MagicMock()
     fake_response.json.return_value = "test"
     fake_response.raise_for_status.return_value = None
-
-    mock_get.return_value = fake_response
-    
     mocked_file = mock_open()
     mocked_file.side_effect = IOError("File write error")
-    with patch("builtins.open", mocked_file):
+
+    with patch("src.extract.requests.get", return_value=fake_response), \
+         patch("builtins.open", mocked_file):
         get_request()
 
-@patch("src.extract.requests.get")
-def test_return_value(mock_get):
-    fake_response = Mock()
+
+def test_return_value():
+    fake_response = MagicMock()
     fake_response.json.return_value = {
         "test": 22,
         "testval2": "Sunny"
     }
     fake_response.raise_for_status.return_value = None
 
-    mock_get.return_value = fake_response
-
-    result = get_request()
+    with patch("src.extract.requests.get", return_value=fake_response):
+        result = get_request()
 
     assert result == {
         "test": 22,
